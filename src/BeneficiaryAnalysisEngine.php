@@ -11,6 +11,8 @@ use Ksfraser\ModulesCommon\ParameterDefinition;
 use Ksfraser\ModulesCommon\ValidationResult;
 use Ksfraser\ModulesCommon\ValidationRuleInterface;
 use Ksfraser\Exceptions\Domain\CalculationException;
+use Ksfraser\Recommendation\RecommendationGenerator;
+use Ksfraser\Recommendation\RelationshipAnalyzer;
 
 /**
  * Beneficiary Analysis Engine
