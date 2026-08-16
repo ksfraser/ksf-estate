@@ -7,7 +7,7 @@ namespace Ksfraser\Estate\Tests;
 use Ksfraser\Estate\EstatePlanningEngine;
 use Ksfraser\ModulesCommon\CalculationEngineInterface;
 use Ksfraser\ModulesCommon\CalculationResult;
-use Ksfraser\Exceptions\Domain\CalculationException;
+use Ksfraser\ModulesCommon\CalculationException;
 use Ksfraser\ModulesCommon\CalculationContext;
 use Ksfraser\Estate\EstateTaxCalculator;
 use Ksfraser\Estate\WealthTransferOptimizer;

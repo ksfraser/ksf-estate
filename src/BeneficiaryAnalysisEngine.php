@@ -10,9 +10,9 @@ use Ksfraser\ModulesCommon\CalculationResult;
 use Ksfraser\ModulesCommon\ParameterDefinition;
 use Ksfraser\ModulesCommon\ValidationResult;
 use Ksfraser\ModulesCommon\ValidationRuleInterface;
-use Ksfraser\Exceptions\Domain\CalculationException;
-use Ksfraser\Recommendation\RecommendationGenerator;
-use Ksfraser\Recommendation\RelationshipAnalyzer;
+use Ksfraser\ModulesCommon\CalculationException;
+use Ksfraser\Estate\RecommendationGenerator;
+use Ksfraser\Estate\RelationshipAnalyzer;
 
 /**
  * Beneficiary Analysis Engine

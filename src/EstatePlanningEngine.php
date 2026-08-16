@@ -10,7 +10,7 @@ use Ksfraser\ModulesCommon\CalculationResult;
 use Ksfraser\ModulesCommon\ParameterDefinition;
 use Ksfraser\ModulesCommon\ValidationResult;
 use Ksfraser\ModulesCommon\ValidationRuleInterface;
-use Ksfraser\Exceptions\Domain\CalculationException;
+use Ksfraser\ModulesCommon\CalculationException;
 
 use DateTimeImmutable;
 
