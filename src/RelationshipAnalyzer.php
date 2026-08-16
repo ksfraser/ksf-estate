@@ -12,7 +12,7 @@ namespace Ksfraser\Estate;
  */
 class RelationshipAnalyzer
 {
-    private RelationshipLookup $lookup;
+    private $lookup;
 
     public function __construct(RelationshipLookup $lookup)
     {

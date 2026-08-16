@@ -24,7 +24,7 @@ use PDOException;
  */
 class ProbateFeeLookup
 {
-    private PDO $pdo;
+    private $pdo;
 
     public function __construct(PDO $pdo)
     {

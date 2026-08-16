@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class DebtManagementEngineTest extends TestCase
 {
-    private DebtManagementEngine $engine;
+    private $engine;
 
     protected function setUp(): void
     {

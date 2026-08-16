@@ -27,15 +27,15 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \Ksfraser\Estate\EstatePlanningEngine
  * @uses \Ksfraser\ModulesCommon\CalculationResult
- * @uses \Ksfraser\Exceptions\Domain\CalculationException
+ * @uses \Ksfraser\ModulesCommon\CalculationException
  */
 class EstatePlanningEngineTest extends TestCase
 {
-    private EstatePlanningEngine $engine;
-    private EstateTaxCalculator $taxCalculator;
-    private \PDO $pdo;
-    private WealthTransferOptimizer $transferOptimizer;
-    private BeneficiaryAnalysisEngine $beneficiaryAnalyzer;
+    private $engine;
+    private $taxCalculator;
+    private $pdo;
+    private $transferOptimizer;
+    private $beneficiaryAnalyzer;
 
     protected function setUp(): void
     {

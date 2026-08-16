@@ -31,10 +31,10 @@ use DateTimeImmutable;
  */
 class EstatePlanningEngine implements CalculationEngineInterface
 {
-    private EstateTaxCalculator $taxCalculator;
-    private WealthTransferOptimizer $transferOptimizer;
-    private BeneficiaryAnalysisEngine $beneficiaryAnalyzer;
-    private ProbateFeeLookup $probateFeeLookup;
+    private $taxCalculator;
+    private $transferOptimizer;
+    private $beneficiaryAnalyzer;
+    private $probateFeeLookup;
 
     public function __construct(
         \PDO $pdo,
@@ -170,7 +170,7 @@ class EstatePlanningEngine implements CalculationEngineInterface
                 [
                     'client_id' => $context->clientId,
                     'advisor_id' => $context->advisorId,
-                    'effective_date' => $context->effectiveDate?->format('c')
+                    'effective_date' => ($context->effectiveDate !== null ? $context->effectiveDate->format('c') : null)
                 ]
             );
 
@@ -412,12 +412,17 @@ class EstatePlanningEngine implements CalculationEngineInterface
      */
     private function getBeneficiaryTaxRate(string $relationship): float
     {
-        return match ($relationship) {
-            'spouse' => 0.0, // Spousal rollover
-            'child', 'children' => 0.0, // No tax for children
-            'trust' => 0.15, // Trust tax rate
-            default => 0.25, // Default capital gains rate
-        };
+        switch ($relationship) {
+            case 'spouse':
+                return 0.0; // Spousal rollover
+            case 'child':
+            case 'children':
+                return 0.0; // No tax for children
+            case 'trust':
+                return 0.15; // Trust tax rate
+            default:
+                return 0.25; // Default capital gains rate
+        }
     }
 
     /**
@@ -451,12 +456,19 @@ class EstatePlanningEngine implements CalculationEngineInterface
      */
     private function estimateLegalFees(float $estateValue, string $type): float
     {
-        $baseRate = match ($type) {
-            'intestate' => 0.02, // 2% for intestate
-            'simple_will' => 0.005, // 0.5% for simple will
-            'complex_will' => 0.015, // 1.5% for complex will
-            default => 0.01
-        };
+        switch ($type) {
+            case 'intestate':
+                $baseRate = 0.02; // 2% for intestate
+                break;
+            case 'simple_will':
+                $baseRate = 0.005; // 0.5% for simple will
+                break;
+            case 'complex_will':
+                $baseRate = 0.015; // 1.5% for complex will
+                break;
+            default:
+                $baseRate = 0.01;
+        }
 
         return round($estateValue * $baseRate, 2);
     }
@@ -706,13 +718,18 @@ class EstatePlanningEngine implements CalculationEngineInterface
      */
     private function analyzeAssetTax(array $asset): string
     {
-        return match ($asset['type']) {
-            'real_estate' => 'Potential capital gains tax on disposition',
-            'investments' => 'Capital gains tax on appreciated assets',
-            'business' => 'Complex valuation and potential tax deferral options',
-            'personal_property' => 'Generally no tax on transfer to beneficiaries',
-            default => 'Tax implications vary by asset type'
-        };
+        switch ($asset['type']) {
+            case 'real_estate':
+                return 'Potential capital gains tax on disposition';
+            case 'investments':
+                return 'Capital gains tax on appreciated assets';
+            case 'business':
+                return 'Complex valuation and potential tax deferral options';
+            case 'personal_property':
+                return 'Generally no tax on transfer to beneficiaries';
+            default:
+                return 'Tax implications vary by asset type';
+        }
     }
 
     /**
@@ -819,11 +836,13 @@ class EstatePlanningEngine implements CalculationEngineInterface
     {
         $riskCount = count($risks);
 
-        return match (true) {
-            $riskCount === 0 => 'low',
-            $riskCount <= 2 => 'medium',
-            default => 'high'
-        };
+        if ($riskCount === 0) {
+            return 'low';
+        }
+        if ($riskCount <= 2) {
+            return 'medium';
+        }
+        return 'high';
     }
 
     /**
@@ -834,12 +853,21 @@ class EstatePlanningEngine implements CalculationEngineInterface
         $strategies = [];
 
         foreach ($risks as $risk) {
-            $strategies = array_merge($strategies, match ($risk) {
-                'intestate_succession' => ['Prepare a valid will', 'Establish testamentary trusts'],
-                'estate_tax_exposure' => ['Implement tax planning strategies', 'Consider life insurance'],
-                'complex_beneficiary_structure' => ['Use testamentary trusts', 'Consider equalization provisions'],
-                default => ['Consult with estate planning professional']
-            });
+            $riskStrategies = [];
+            switch ($risk) {
+                case 'intestate_succession':
+                    $riskStrategies = ['Prepare a valid will', 'Establish testamentary trusts'];
+                    break;
+                case 'estate_tax_exposure':
+                    $riskStrategies = ['Implement tax planning strategies', 'Consider life insurance'];
+                    break;
+                case 'complex_beneficiary_structure':
+                    $riskStrategies = ['Use testamentary trusts', 'Consider equalization provisions'];
+                    break;
+                default:
+                    $riskStrategies = ['Consult with estate planning professional'];
+            }
+            $strategies = array_merge($strategies, $riskStrategies);
         }
 
         return array_unique($strategies);
@@ -1111,7 +1139,7 @@ class EstatePlanningEngine implements CalculationEngineInterface
     private function recommendBeneficiariesForAccount(array $account, array $beneficiaries): array
     {
         // Simplified logic - in practice this would be more sophisticated
-        $spouseBeneficiaries = array_filter($beneficiaries, fn($b) => ($b['relationship'] ?? '') === 'spouse');
+        $spouseBeneficiaries = array_filter($beneficiaries, function ($b) { return ($b['relationship'] ?? '') === 'spouse'; });
         if (!empty($spouseBeneficiaries)) {
             return array_slice($spouseBeneficiaries, 0, 1); // Primary: spouse
         }

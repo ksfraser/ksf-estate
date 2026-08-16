@@ -149,7 +149,7 @@ class DebtManagementEngine implements CalculationEngineInterface
     public function analyzeDebtPayoff(array $debts, float $availableLiquidity): array
     {
         $ranked = $debts;
-        usort($ranked, fn($a, $b) => ($b['rate'] ?? 0.0) <=> ($a['rate'] ?? 0.0));
+        usort($ranked, function ($a, $b) { return ($b['rate'] ?? 0.0) <=> ($a['rate'] ?? 0.0); });
 
         $remaining = $availableLiquidity;
         $plan = [];

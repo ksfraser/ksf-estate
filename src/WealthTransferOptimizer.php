@@ -20,7 +20,7 @@ use Ksfraser\ModulesCommon\CalculationException;
  */
 class WealthTransferOptimizer
 {
-    private EstateTaxCalculator $taxCalculator;
+    private $taxCalculator;
 
     public function __construct(EstateTaxCalculator $taxCalculator)
     {
@@ -129,7 +129,7 @@ class WealthTransferOptimizer
      */
     private function createSpousalRolloverStrategy(array $estateData, array $beneficiaries, int $taxYear): array
     {
-        $spouseBeneficiaries = array_filter($beneficiaries, fn($b) => ($b['relationship'] ?? '') === 'spouse');
+        $spouseBeneficiaries = array_filter($beneficiaries, function ($b) { return ($b['relationship'] ?? '') === 'spouse'; });
 
         if (empty($spouseBeneficiaries)) {
             return [
@@ -315,25 +315,47 @@ class WealthTransferOptimizer
         $score += min(40, ($taxSavings / 100000) * 40); // Normalize to $100K tax savings = 40 points
 
         // Implementation complexity (20% weight) - simpler is better
-        $complexityPenalty = match($strategy['type']) {
-            'gifts' => 5,      // Simple annual gifts
-            'spousal_rollover' => 2, // Very simple
-            'insurance' => 8,  // Moderate complexity
-            'trust' => 15,     // Complex
-            'business' => 18,  // Very complex
-            'charitable' => 12, // Moderately complex
-            default => 10
-        };
+        switch ($strategy['type']) {
+            case 'gifts':
+                $complexityPenalty = 5;
+                break;
+            case 'spousal_rollover':
+                $complexityPenalty = 2;
+                break;
+            case 'insurance':
+                $complexityPenalty = 8;
+                break;
+            case 'trust':
+                $complexityPenalty = 15;
+                break;
+            case 'business':
+                $complexityPenalty = 18;
+                break;
+            case 'charitable':
+                $complexityPenalty = 12;
+                break;
+            default:
+                $complexityPenalty = 10;
+        }
         $score += (20 - $complexityPenalty);
 
         // Time horizon benefit (20% weight) - longer time horizons allow more planning
-        $timeBonus = match($strategy['time_horizon'] ?? 'immediate') {
-            'immediate' => 5,
-            'estate_distribution' => 10,
-            'multi-year' => 20,
-            'policy_maturity' => 15,
-            default => 10
-        };
+        switch ($strategy['time_horizon'] ?? 'immediate') {
+            case 'immediate':
+                $timeBonus = 5;
+                break;
+            case 'estate_distribution':
+                $timeBonus = 10;
+                break;
+            case 'multi-year':
+                $timeBonus = 20;
+                break;
+            case 'policy_maturity':
+                $timeBonus = 15;
+                break;
+            default:
+                $timeBonus = 10;
+        }
         $score += $timeBonus;
 
         // Beneficiary impact (20% weight)
@@ -348,13 +370,19 @@ class WealthTransferOptimizer
      */
     private function getRecommendation(float $score): string
     {
-        return match(true) {
-            $score >= 80 => 'Highly Recommended',
-            $score >= 60 => 'Recommended',
-            $score >= 40 => 'Consider',
-            $score >= 20 => 'Limited Benefit',
-            default => 'Not Recommended'
-        };
+        if ($score >= 80) {
+            return 'Highly Recommended';
+        }
+        if ($score >= 60) {
+            return 'Recommended';
+        }
+        if ($score >= 40) {
+            return 'Consider';
+        }
+        if ($score >= 20) {
+            return 'Limited Benefit';
+        }
+        return 'Not Recommended';
     }
 
     /**
@@ -363,7 +391,7 @@ class WealthTransferOptimizer
     private function selectOptimalStrategy(array $evaluatedStrategies): array
     {
         // Sort by score descending
-        usort($evaluatedStrategies, fn($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
+        usort($evaluatedStrategies, function ($a, $b) { return ($b['score'] ?? 0) <=> ($a['score'] ?? 0); });
 
         $optimal = $evaluatedStrategies[0] ?? [];
 
@@ -383,14 +411,20 @@ class WealthTransferOptimizer
     // Helper methods
     private function getAnnualGiftExemption(int $taxYear): float
     {
-        return match($taxYear) {
-            2025 => 17156,
-            2024 => 16476,
-            2023 => 15576,
-            2022 => 15380,
-            2021 => 15380,
-            default => 17156
-        };
+        switch ($taxYear) {
+            case 2025:
+                return 17156;
+            case 2024:
+                return 16476;
+            case 2023:
+                return 15576;
+            case 2022:
+                return 15380;
+            case 2021:
+                return 15380;
+            default:
+                return 17156;
+        }
     }
 
     private function distributeToBeneficiaries(float $amount, array $beneficiaries): array

@@ -77,16 +77,18 @@ ValidationResult) and `Ksfraser\Exceptions\Domain` (domain exceptions).
 
 ## Coding Standards
 
-### PHP Compatibility — ⚠️ OPEN ISSUE
+### PHP Compatibility — ✅ RESOLVED (7.3-clean)
 
-- **House standard (see ksf_GPG/AGENTS.md): PHP 7.3 (FA 2.4.19) — no PHP 8+ features.**
-- **CURRENT STATE: this package currently uses PHP 8.1 syntax** (`match()`, `fn()` arrow
-  functions, typed properties, `readonly` properties) and will **NOT parse on PHP 7.3**.
-  This is tech debt that MUST be backported to 7.3-compatible syntax before deployment to
-  the FA 2.4.19 (PHP 7.3) runtime, OR the estate/FA runtime must be upgraded to PHP 8.1
-  (which requires dropping the 7.3 constraint project-wide). **This decision is pending.**
+- **House standard (see ksf_GPG/AGENTS.md): PHP 7.3 (FA 2.4.19) — no PHP 8+ features.** ✅ Enforced.
+- **CURRENT STATE (2026-08-15 backport): the package and its `ksf_modules_common` dependency are
+  7.3-clean.** All `match()` → `switch`, `fn()` → `function(){}`, promoted/`readonly`/typed
+  properties → plain untyped properties with explicit constructor assignment, `mixed` type hints
+  removed, nullsafe `?->` → guarded calls, and `$e::class`/`static::class` → `get_class()`/
+  `get_called_class()`. A scanner (`match`, `fn`, `readonly`, `mixed`, nullsafe `?->`,
+  variable/`static::class`, typed-property) reports zero violations, and the 47-test suite passes.
 - Use `declare(strict_types=1);` at the top of all PHP files.
-- Until the above is resolved, development/tests run on PHP 8.1.
+- `ksf_modules_common` (the shared dependency) was likewise backported to 7.3 in the same effort,
+  so the whole estate stack parses on PHP 7.3.
 
 ### Naming Conventions
 

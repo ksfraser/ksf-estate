@@ -22,8 +22,8 @@ use Ksfraser\Estate\RelationshipAnalyzer;
  */
 class BeneficiaryAnalysisEngine
 {
-    private RelationshipAnalyzer $relationshipAnalyzer;
-    private RecommendationGenerator $recommendationGenerator;
+    private $relationshipAnalyzer;
+    private $recommendationGenerator;
 
     public function __construct(
         RelationshipAnalyzer $relationshipAnalyzer,
@@ -62,7 +62,7 @@ class BeneficiaryAnalysisEngine
     {
         $totalBeneficiaries = count($beneficiaries);
         $totalAccounts = count($accounts);
-        $designatedAccounts = count(array_filter($accounts, fn($acc) => !empty($acc['beneficiaries'])));
+        $designatedAccounts = count(array_filter($accounts, function ($acc) { return !empty($acc['beneficiaries']); }));
 
         return [
             'total_beneficiaries' => $totalBeneficiaries,
@@ -70,8 +70,8 @@ class BeneficiaryAnalysisEngine
             'designated_accounts' => $designatedAccounts,
             'undesignated_accounts' => $totalAccounts - $designatedAccounts,
             'designation_coverage' => $totalAccounts > 0 ? round(($designatedAccounts / $totalAccounts) * 100, 1) : 0,
-            'primary_beneficiaries' => count(array_filter($beneficiaries, fn($b) => ($b['type'] ?? '') === 'primary')),
-            'contingent_beneficiaries' => count(array_filter($beneficiaries, fn($b) => ($b['type'] ?? '') === 'contingent'))
+            'primary_beneficiaries' => count(array_filter($beneficiaries, function ($b) { return ($b['type'] ?? '') === 'primary'; })),
+            'contingent_beneficiaries' => count(array_filter($beneficiaries, function ($b) { return ($b['type'] ?? '') === 'contingent'; }))
         ];
     }
 
@@ -89,8 +89,8 @@ class BeneficiaryAnalysisEngine
                 'account_name' => $account['name'] ?? 'Unknown Account',
                 'account_type' => $account['type'] ?? 'unknown',
                 'value' => $account['value'] ?? 0,
-                'primary_beneficiaries' => array_filter($accountBeneficiaries, fn($b) => ($b['type'] ?? '') === 'primary'),
-                'contingent_beneficiaries' => array_filter($accountBeneficiaries, fn($b) => ($b['type'] ?? '') === 'contingent'),
+                'primary_beneficiaries' => array_filter($accountBeneficiaries, function ($b) { return ($b['type'] ?? '') === 'primary'; }),
+                'contingent_beneficiaries' => array_filter($accountBeneficiaries, function ($b) { return ($b['type'] ?? '') === 'contingent'; }),
                 'has_designation' => !empty($accountBeneficiaries),
                 'designation_date' => $account['designation_date'] ?? null,
                 'needs_update' => $this->checkIfNeedsUpdate($account)
@@ -162,7 +162,7 @@ class BeneficiaryAnalysisEngine
         $gaps = [];
 
         // Check for accounts without beneficiary designations
-        $undesignatedAccounts = array_filter($accounts, fn($acc) => empty($acc['beneficiaries']));
+        $undesignatedAccounts = array_filter($accounts, function ($acc) { return empty($acc['beneficiaries']); });
         if (!empty($undesignatedAccounts)) {
             $totalUndesignatedValue = array_sum(array_column($undesignatedAccounts, 'value'));
             $gaps[] = [
@@ -177,8 +177,8 @@ class BeneficiaryAnalysisEngine
         // Check for missing contingent beneficiaries
         $missingContingents = array_filter($accounts, function($acc) {
             $beneficiaries = $acc['beneficiaries'] ?? [];
-            $primaries = array_filter($beneficiaries, fn($b) => ($b['type'] ?? '') === 'primary');
-            $contingents = array_filter($beneficiaries, fn($b) => ($b['type'] ?? '') === 'contingent');
+            $primaries = array_filter($beneficiaries, function ($b) { return ($b['type'] ?? '') === 'primary'; });
+            $contingents = array_filter($beneficiaries, function ($b) { return ($b['type'] ?? '') === 'contingent'; });
             return !empty($primaries) && empty($contingents);
         });
 
@@ -251,7 +251,7 @@ class BeneficiaryAnalysisEngine
         }
 
         // Identify accounts that could benefit from spousal designation
-        $highValueAccounts = array_filter($accounts, fn($acc) => ($acc['value'] ?? 0) > 100000);
+        $highValueAccounts = array_filter($accounts, function ($acc) { return ($acc['value'] ?? 0) > 100000; });
         $taxAnalysis['tax_efficient_accounts'] = array_map(function($acc) {
             return [
                 'name' => $acc['name'],

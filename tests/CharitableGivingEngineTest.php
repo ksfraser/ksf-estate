@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class CharitableGivingEngineTest extends TestCase
 {
-    private CharitableGivingEngine $engine;
+    private $engine;
 
     protected function setUp(): void
     {

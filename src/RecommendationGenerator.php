@@ -13,7 +13,7 @@ namespace Ksfraser\Estate;
  */
 class RecommendationGenerator
 {
-    private RecommendationLookup $lookup;
+    private $lookup;
 
     public function __construct(RecommendationLookup $lookup)
     {
@@ -79,8 +79,8 @@ class RecommendationGenerator
                 $fields['undesignated_accounts']++;
             }
 
-            $primaries = array_filter($designations, fn($b) => ($b['type'] ?? '') === 'primary');
-            $contingents = array_filter($designations, fn($b) => ($b['type'] ?? '') === 'contingent');
+            $primaries = array_filter($designations, function ($b) { return ($b['type'] ?? '') === 'primary'; });
+            $contingents = array_filter($designations, function ($b) { return ($b['type'] ?? '') === 'contingent'; });
             if (!empty($primaries) && empty($contingents)) {
                 $fields['missing_contingents']++;
             }
